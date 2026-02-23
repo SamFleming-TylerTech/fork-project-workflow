@@ -1,0 +1,6 @@
+# Fork sync infrastructure — requires review from erp-operations team
+# See FORK_MANIFEST.json for upstream tracking details
+
+*                       @tyler-technologies-oss/erp-operations
+.github/                @tyler-technologies-oss/erp-operations
+FORK_MANIFEST.json      @tyler-technologies-oss/erp-operations

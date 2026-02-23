@@ -1,0 +1,22 @@
+name: Sync Tags
+
+on:
+  schedule:
+    - cron: '0 6 * * 3'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: sync-tags
+  cancel-in-progress: false
+
+jobs:
+  check-tags:
+    uses: __TEMPLATES_REPO__/.github/workflows/sync-tags.yml@__TEMPLATES_REF__
+    with:
+      upstream_owner: __UPSTREAM_OWNER__
+      upstream_repo: __UPSTREAM_REPO__
+    secrets: inherit
