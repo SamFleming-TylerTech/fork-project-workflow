@@ -1,0 +1,31 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force sync even if already up to date'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    uses: __TEMPLATES_REPO__/.github/workflows/sync-upstream.yml@__TEMPLATES_REF__
+    with:
+      upstream_owner: __UPSTREAM_OWNER__
+      upstream_repo: __UPSTREAM_REPO__
+      default_branch: __DEFAULT_BRANCH__
+      force: ${{ inputs.force || false }}
+    secrets: inherit

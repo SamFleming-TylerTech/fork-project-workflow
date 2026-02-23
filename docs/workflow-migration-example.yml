@@ -1,0 +1,74 @@
+# ==============================================================================
+# Workflow Migration Example: Switching to Forked GitHub Actions
+# ==============================================================================
+#
+# This file demonstrates the changes needed in your CI/CD workflows to reference
+# forked actions in tyler-technologies-oss instead of third-party upstreams.
+#
+# WHY: Referencing forks protects against supply chain attacks where upstream
+# maintainers could mutate tags, get compromised, or inject malicious code.
+#
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# BEFORE: Direct upstream references (INSECURE)
+# ------------------------------------------------------------------------------
+# These reference third-party repos directly. Tag v1.3.0 could be force-pushed
+# to point at malicious code at any time.
+#
+#   - name: Code Coverage Summary
+#     uses: acme/deploy-action@v1.3.0
+#
+#   - name: Add Coverage PR Comment
+#     uses: acme/pr-comment-action@v2
+#
+#   - name: Publish Test Results
+#     uses: acme/test-results-action@v2.19.0
+#
+#   - name: Report Generator
+#     uses: acme/report-action@v5.4.5
+
+# ------------------------------------------------------------------------------
+# AFTER: Forked references (SECURE)
+# ------------------------------------------------------------------------------
+# These reference our organizational forks. Tags are reviewed and created by
+# our team after security review. FORK_MANIFEST.json tracks provenance.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # ... build steps ...
+
+      - name: Code Coverage Summary
+        uses: my-org/deploy-action@v1.3.0
+
+      - name: Add Coverage PR Comment
+        uses: my-org/pr-comment-action@v2
+
+      - name: Publish Test Results
+        uses: my-org/test-results-action@v2.19.0
+
+      - name: Report Generator
+        uses: my-org/report-action@v5.4.5
+
+# ------------------------------------------------------------------------------
+# MAXIMUM SECURITY: Pin to full commit SHA (optional)
+# ------------------------------------------------------------------------------
+# For the highest level of supply chain security, pin to the exact commit SHA
+# from the fork. This is immune to tag mutation.
+#
+#   - name: Code Coverage Summary
+#     uses: my-org/deploy-action@abc123def456...
+#
+# The SHA can be found in FORK_MANIFEST.json under pinned_tags[].fork_sha
+
+# ------------------------------------------------------------------------------
+# ACTIONS THAT DO NOT NEED FORKING
+# ------------------------------------------------------------------------------
+# These are maintained by GitHub (corporate-backed) or Tyler (internal):
+#
+#   actions/checkout@v4           # Official GitHub action
+#   actions/setup-dotnet@v4       # Official GitHub action
+#   actions/upload-artifact@v4    # Official GitHub action
+#   tyler-technologies/*          # Internal Tyler actions
