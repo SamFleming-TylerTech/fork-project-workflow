@@ -6,7 +6,7 @@ Automated tooling for forking third-party GitHub Actions into your organization 
 
 When your CI/CD pipelines depend on third-party GitHub Actions, you're exposed to supply chain attacks -- tag mutations, compromised maintainer accounts, or malicious code injection. Forking the Action and pinning to reviewed tags eliminates this risk.
 
-This repo provides `fork-action.sh` to bootstrap forks with sync infrastructure, and thin caller workflows that reference centralized [reusable workflows](https://github.com/SamFleming-TylerTech/fork-action-sync-templates) for ongoing maintenance.
+This repo provides `fork-action.sh` to bootstrap forks with sync infrastructure, and thin caller workflows that reference centralized [reusable workflows](https://github.com/SamFleming-TylerTech/fork-sync-shared-workflow) for ongoing maintenance.
 
 ## How It Works
 
@@ -44,7 +44,7 @@ FORK_MANIFEST.json     # Upstream provenance and sync state
 CODEOWNERS             # Protects sync infrastructure files
 ```
 
-Each workflow is a thin caller that delegates to reusable workflows in `fork-action-sync-templates` via the `@v1` floating tag. Bug fixes and improvements propagate to all forks automatically.
+Each workflow is a thin caller that delegates to reusable workflows in `fork-sync-shared-workflow` via the `@v1` floating tag. Bug fixes and improvements propagate to all forks automatically.
 
 ## Options
 
@@ -54,7 +54,7 @@ Each workflow is a thin caller that delegates to reusable workflows in `fork-act
 | `--tag <tag>` | Pin a specific upstream tag (e.g., `v7.0.8`) |
 | `--existing` | Operate on an already-forked repo |
 | `--force-update` | Overwrite existing sync infrastructure (use with `--existing`) |
-| `--templates-repo <r>` | Central templates repo (default: `SamFleming-TylerTech/fork-action-sync-templates`) |
+| `--templates-repo <r>` | Central templates repo (default: `SamFleming-TylerTech/fork-sync-shared-workflow`) |
 | `--templates-ref <ref>` | Central templates ref/tag (default: `v1`) |
 
 Environment variables `FORK_ORG`, `TEMPLATES_REPO`, and `TEMPLATES_REF` can also be used.
@@ -82,4 +82,4 @@ docs/
 
 ## Related
 
-- [fork-action-sync-templates](https://github.com/SamFleming-TylerTech/fork-action-sync-templates) -- Reusable workflows referenced by caller templates
+- [fork-sync-shared-workflow](https://github.com/SamFleming-TylerTech/fork-sync-shared-workflow) -- Reusable workflows referenced by caller templates
