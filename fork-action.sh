@@ -21,7 +21,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FORK_ORG="${FORK_ORG:-tyler-technologies-oss}"
-TEMPLATES_REPO="${TEMPLATES_REPO:-my-org/fork-sync-shared-workflow}"
+TEMPLATES_REPO="${TEMPLATES_REPO:-SamFleming-TylerTech/fork-sync-shared-workflow}"
 TEMPLATES_REF="${TEMPLATES_REF:-v1}"
 FORK_IS_PERSONAL=false
 TEMP_DIR=""
@@ -81,7 +81,7 @@ OPTIONS:
     --tag <tag>            Pin a specific upstream tag in the fork (e.g. v7.0.8)
     --existing             Operate on an already-forked repo in the target org/user
     --force-update         Force overwrite existing sync infrastructure (use with --existing)
-    --templates-repo <r>   Central templates repo (default: my-org/fork-sync-shared-workflow, or TEMPLATES_REPO env var)
+    --templates-repo <r>   Central templates repo (default: SamFleming-TylerTech/fork-sync-shared-workflow, or TEMPLATES_REPO env var)
     --templates-ref <ref>  Central templates ref/tag (default: v1, or TEMPLATES_REF env var)
     --help                 Show this help message and exit
 

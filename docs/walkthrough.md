@@ -124,7 +124,7 @@ Output:
   Upstream:         https://github.com/some-vendor/deploy-action
   Default branch:   main
   Tracking branch:  upstream-tracking
-  Templates repo:   my-org/fork-sync-shared-workflow@v1
+  Templates repo:   SamFleming-TylerTech/fork-sync-shared-workflow@v1
   Pinned tag:       v2.0.0
 
   Next steps:
@@ -338,14 +338,14 @@ The caller workflows in each fork are thin -- they just reference reusable workf
 # In the fork: .github/workflows/sync-upstream.yml
 jobs:
   sync:
-    uses: my-org/fork-sync-shared-workflow/.github/workflows/sync-upstream.yml@v1
+    uses: SamFleming-TylerTech/fork-sync-shared-workflow/.github/workflows/sync-upstream.yml@v1
     with:
       upstream_owner: some-vendor
       upstream_repo: deploy-action
     secrets: inherit
 ```
 
-All the logic lives in `fork-action-sync-templates`. When you fix a bug or add a feature there:
+All the logic lives in `fork-sync-shared-workflow`. When you fix a bug or add a feature there:
 - Tag it as `v1` (floating tag)
 - Every fork picks up the change on the next run
 - Zero per-fork maintenance
