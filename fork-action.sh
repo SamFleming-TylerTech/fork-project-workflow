@@ -222,6 +222,23 @@ validate_slug() {
     fi
 }
 
+validate_org() {
+    if [[ ! "${FORK_ORG}" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+        error "Invalid org/user '${FORK_ORG}'. Must start with alphanumeric, contain only [A-Za-z0-9._-]."
+        exit 1
+    fi
+}
+
+validate_tag() {
+    if [[ -z "${TAG}" ]]; then
+        return 0
+    fi
+    if [[ ! "${TAG}" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+        error "Invalid tag '${TAG}'. Must start with alphanumeric, contain only [A-Za-z0-9._-]."
+        exit 1
+    fi
+}
+
 check_prerequisites() {
     info "Checking prerequisites..."
 
@@ -429,6 +446,14 @@ generate_fork_manifest() {
         exit 1
     fi
 
+    # Get upstream repo ID (used to detect repo transfers/name squatting)
+    local upstream_repo_id
+    upstream_repo_id="$(gh api "repos/${UPSTREAM_SLUG}" --jq '.id' 2>/dev/null)"
+    if [[ -z "${upstream_repo_id}" ]]; then
+        error "Could not resolve upstream repo ID for ${UPSTREAM_SLUG}."
+        exit 1
+    fi
+
     local sync_date
     sync_date="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
@@ -436,6 +461,7 @@ generate_fork_manifest() {
 
     sed -i "s|__UPSTREAM_OWNER__|${UPSTREAM_OWNER}|g" "${dst}"
     sed -i "s|__UPSTREAM_REPO__|${UPSTREAM_REPO}|g" "${dst}"
+    sed -i "s|__UPSTREAM_REPO_ID__|${upstream_repo_id}|g" "${dst}"
     sed -i "s|__DEFAULT_BRANCH__|${DEFAULT_BRANCH}|g" "${dst}"
     sed -i "s|__UPSTREAM_SHA__|${upstream_sha}|g" "${dst}"
     sed -i "s|__SYNC_DATE__|${sync_date}|g" "${dst}"
@@ -567,6 +593,24 @@ configure_branch_protection() {
 EOF
 
     success "Branch protection configured (1 reviewer, security-scan required, enforced for admins)."
+
+    # Protect upstream-tracking branch (only sync workflow should push to it)
+    info "Configuring branch protection for 'upstream-tracking'..."
+    gh api "repos/${FORK_ORG}/${UPSTREAM_REPO}/branches/upstream-tracking/protection" \
+        --method PUT \
+        --silent \
+        --input - <<'UTEOF'
+{
+    "required_status_checks": null,
+    "enforce_admins": true,
+    "required_pull_request_reviews": null,
+    "restrictions": null,
+    "allow_force_pushes": false,
+    "allow_deletions": false
+}
+UTEOF
+
+    success "Branch protection for 'upstream-tracking' configured (no force-push, no deletion)."
 }
 
 create_tag() {
@@ -676,6 +720,8 @@ print_summary() {
 main() {
     parse_args "$@"
     validate_slug
+    validate_org
+    validate_tag
     split_slug
     check_prerequisites
     check_template_files

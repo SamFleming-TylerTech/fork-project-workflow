@@ -3,6 +3,7 @@
   "upstream": {
     "owner": "__UPSTREAM_OWNER__",
     "repo": "__UPSTREAM_REPO__",
+    "repo_id": __UPSTREAM_REPO_ID__,
     "url": "https://github.com/__UPSTREAM_OWNER__/__UPSTREAM_REPO__",
     "default_branch": "__DEFAULT_BRANCH__"
   },
