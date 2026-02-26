@@ -30,7 +30,7 @@ jobs:
       merge_success: ${{ steps.merge.outputs.merge_success }}
     steps:
       - name: Checkout fork
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
           ref: upstream-tracking
@@ -40,6 +40,29 @@ jobs:
 
       - name: Fetch upstream default branch
         run: git fetch upstream __DEFAULT_BRANCH__
+
+      - name: Verify upstream repo identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f FORK_MANIFEST.json ]; then
+            EXPECTED_ID=$(jq -r '.upstream.repo_id // empty' FORK_MANIFEST.json)
+            if [ -n "${EXPECTED_ID}" ]; then
+              ACTUAL_ID=$(gh api "repos/__UPSTREAM_OWNER__/__UPSTREAM_REPO__" --jq '.id' 2>/dev/null || echo "")
+              if [ -z "${ACTUAL_ID}" ]; then
+                echo "::error::Upstream repo __UPSTREAM_OWNER__/__UPSTREAM_REPO__ is no longer accessible."
+                exit 1
+              elif [ "${ACTUAL_ID}" != "${EXPECTED_ID}" ]; then
+                echo "::error::SECURITY ALERT: Upstream repo ID changed from ${EXPECTED_ID} to ${ACTUAL_ID}."
+                echo "::error::This may indicate the repository was deleted and re-created (name squatting attack)."
+                exit 1
+              else
+                echo "Upstream repo identity verified (ID: ${ACTUAL_ID})"
+              fi
+            else
+              echo "No repo_id in manifest, skipping identity check."
+            fi
+          fi
 
       - name: Compare SHAs
         id: compare
@@ -75,7 +98,7 @@ jobs:
 
       - name: Open divergence issue on merge failure
         if: steps.compare.outputs.in_sync == 'false' && steps.merge.outputs.merge_success == 'false'
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             await github.rest.issues.create({
@@ -87,6 +110,14 @@ jobs:
                 '## Upstream Divergence Detected',
                 '',
                 'The `upstream-tracking` branch has diverged from `__UPSTREAM_OWNER__/__UPSTREAM_REPO__@__DEFAULT_BRANCH__` and cannot be fast-forward merged.',
+                '',
+                '> **Security Note:** A non-fast-forward divergence may indicate that the upstream repository had its history rewritten (force-push). This is unusual for maintained projects and should be investigated before resolving.',
+                '',
+                '### Investigation Steps',
+                '',
+                '1. Check if the upstream repo was recently transferred, renamed, or recreated.',
+                '2. Review the upstream commit history for signs of force-push or rebase.',
+                '3. Compare the `FORK_MANIFEST.json` `repo_id` against the current upstream repo ID.',
                 '',
                 '### Manual Resolution Steps',
                 '',

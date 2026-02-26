@@ -1,6 +1,15 @@
 # Fork sync infrastructure — requires review from erp-operations team
 # See FORK_MANIFEST.json for upstream tracking details
 
-*                       @tyler-technologies-oss/erp-operations
+# Sync infrastructure
 .github/                @tyler-technologies-oss/erp-operations
 FORK_MANIFEST.json      @tyler-technologies-oss/erp-operations
+CODEOWNERS              @tyler-technologies-oss/erp-operations
+
+# Action definition files (primary attack surface)
+action.yml              @tyler-technologies-oss/erp-operations
+action.yaml             @tyler-technologies-oss/erp-operations
+Dockerfile              @tyler-technologies-oss/erp-operations
+
+# Compiled/vendored code (could contain tampered bundles)
+dist/                   @tyler-technologies-oss/erp-operations

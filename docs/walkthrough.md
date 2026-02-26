@@ -189,10 +189,11 @@ The fork's tag is unaffected.
 
 ### Security Scan (on every sync PR)
 
-Triggers automatically after sync-upstream completes via `workflow_run`. Runs two checks in parallel:
+Triggers automatically after sync-upstream completes via `workflow_run`. Runs three checks in parallel:
 
 | Check | What it does |
 |-------|-------------|
+| `codeql` | Runs CodeQL static analysis (javascript-typescript by default) |
 | `dependency-review` | Scans for new vulnerabilities in dependency changes |
 | `diff-summary` | Posts a comment with changed file stats, flags action manifests, scripts, binaries |
 
@@ -203,7 +204,7 @@ sync-upstream completes
   -> workflow_run fires
     -> security-scan triggers
       -> find-pr discovers the open PR
-      -> dependency-review, diff-summary run in parallel
+      -> codeql, dependency-review, diff-summary run in parallel
       -> report-status posts check runs + commit status on PR
 ```
 
@@ -241,7 +242,7 @@ gh workflow run sync-tags.yml    --repo SamFleming-TylerTech/fork-test
 | Artifact | What it shows |
 |----------|--------------|
 | Sync PR | Upstream sync with diff stats, security-relevant files, review checklist |
-| PR checks | `security-scan`, `security-scan/dependency-review`, `security-scan/diff-summary` -- all green |
+| PR checks | `security-scan`, `security-scan/codeql`, `security-scan/dependency-review`, `security-scan/diff-summary` -- all green |
 | PR comment | Security diff summary (files changed, lines added/removed, manifest/script/binary changes) |
 | Issue: tag mutation | `v1.0.0` moved to a different commit with comparison link |
 | Issue: new release | `v1.1.0` detected with security review checklist |

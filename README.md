@@ -13,7 +13,7 @@ This repo provides `fork-action.sh` to bootstrap forks with sync infrastructure 
 1. **`fork-action.sh`** (one-time setup) -- Creates the fork, workflows, manifest, and branch structure
 2. **Sync Upstream** (weekly cron) -- Fast-forward merges the `upstream-tracking` branch with upstream's default branch, opens a PR for review
 3. **Sync Tags** (weekly cron) -- Detects new upstream releases, tag mutations, and deletions
-4. **Security Scan** (automatic) -- Runs dependency review and posts a diff summary on each sync PR
+4. **Security Scan** (automatic) -- Runs CodeQL, dependency review, and diff summary on each sync PR
 
 ## Quick Start
 
@@ -39,7 +39,7 @@ In the fork repository:
 .github/workflows/
   sync-upstream.yml    # Syncs upstream changes, creates PR
   sync-tags.yml        # Monitors tag mutations, new releases, deletions
-  security-scan.yml    # Runs dependency review + diff summary on sync PRs
+  security-scan.yml    # Runs CodeQL, dependency review + diff summary on sync PRs
 FORK_MANIFEST.json     # Upstream provenance and sync state
 CODEOWNERS             # Protects sync infrastructure files
 ```
